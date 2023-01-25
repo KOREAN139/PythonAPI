@@ -35,6 +35,8 @@ class Connection:
         self.ego = ego_agent
         self.ws = create_connection(self.url)
         self.gps_offset = lgsvl.Vector()
+        self.instrumentation_url = "ws://" + ip + ":" + port + "/instrumentation"
+        self.instrumentation_ws = create_connection(self.instrumentation_url)
 
     def set_destination(self, x_long_east, z_lat_north, y=0, coord_type=CoordType.Unity):
         """
@@ -350,6 +352,18 @@ class Connection:
             raise WaitApolloError()
 
         self.ego.state = initial_state
+
+    def get_instrumentation_data(self):
+        self.instrumentation_ws.send(json.dumps(
+            {
+                "type": "RequestInstrumentationData",
+            }
+        ))
+
+        data = json.loads(self.instrumentation_ws.recv())
+        while data["type"] != "Instrumentation":
+            data = json.loads(self.instrumentation_ws.recv())
+        return data
 
 
 class WaitApolloError(Exception):
