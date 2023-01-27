@@ -365,6 +365,18 @@ class Connection:
             data = json.loads(self.instrumentation_ws.recv())
         return data
 
+    def get_hdmap_data(self):
+        self.instrumentation_ws.send(json.dumps(
+            {
+                "type": "RequestMapData",
+            }
+        ))
+
+        data = json.loads(self.instrumentation_ws.recv())
+        while data["type"] != "HDMap":
+            data = json.loads(self.instrumentation_ws.recv())
+        return data
+
 
 class WaitApolloError(Exception):
     """
