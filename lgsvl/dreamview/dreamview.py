@@ -349,9 +349,11 @@ class Connection:
         else:
             log.error("No control message from Apollo within {} seconds. Aborting...".format(timeout))
             self.disable_apollo()
-            raise WaitApolloError()
+            #  raise WaitApolloError()
+            return False
 
         self.ego.state = initial_state
+        return True
 
     def get_instrumentation_data(self):
         self.instrumentation_ws.send(json.dumps(
