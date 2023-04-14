@@ -318,12 +318,14 @@ class NpcVehicle(Vehicle):
             },
         )
 
-    def follow_closest_lane(self, follow, max_speed, isLaneChange=True):
+    def follow_closest_lane(self, follow, initial_speed, max_speed, isLaneChange=True):
+    # def follow_closest_lane(self, follow, max_speed, isLaneChange=True):
         self.remote.command(
             "vehicle/follow_closest_lane",
             {
                 "uid": self.uid,
                 "follow": follow,
+                "initial_speed": initial_speed,
                 "max_speed": max_speed,
                 "isLaneChange": isLaneChange,
             },

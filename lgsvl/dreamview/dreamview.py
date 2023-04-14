@@ -12,6 +12,7 @@ import math
 import logging
 import sys
 import os
+import time
 
 log = logging.getLogger(__name__)
 
@@ -312,12 +313,26 @@ class Connection:
         initial_state = self.ego.state
         mod_status = self.get_module_status()
 
-        # If any module is not enabled, Control may still send a message even though Apollo is not ready
         if not all(mod_status[mod] for mod in modules):
             self.disable_apollo()
 
         self.enable_apollo(dest_x, dest_z, modules, coord_type=coord_type)
         self.ego.is_control_received = False
+
+        start_time = time.time()
+        mod_status = self.get_module_status()
+        while not all(mod_status[mod] for mod in modules):
+            if time.time() - start_time > default_timeout:
+                log.error("Module Run Error: Module missing within {} seconds. Aborting...".format(default_timeout))
+                self.disable_apollo()
+                raise WaitApolloError()
+
+            for mod in modules:
+                if not mod_status[mod]:
+                    self.enable_module(mod)
+            time.sleep(5)
+
+            mod_status = self.get_module_status()
 
         def on_control_received(agent, kind, context):
             if kind == "checkControl":
@@ -326,15 +341,12 @@ class Connection:
 
         self.ego.on_custom(on_control_received)
 
-        try:
-            timeout = float(os.environ.get("LGSVL__DREAMVIEW__CONTROL_MESSAGE_TIMEOUT_SECS", default_timeout))
-        except Exception:
-            timeout = default_timeout
-            log.warning("Invalid LGSVL__DREAMVIEW__CONTROL_MESSAGE_TIMEOUT_SECS, using default {0}s".format(default_timeout))
+        mod_status = self.get_module_status()
+        print("module: " + str(all(mod_status[mod] for mod in modules)))
 
         run_time = 2
-        elapsed = 0
-        while timeout <= 0.0 or float(elapsed) < timeout:
+        elapsed = time.time() - start_time
+        while elapsed < default_timeout:
             self.sim.run(run_time)
 
             if self.ego.is_control_received:
@@ -345,9 +357,9 @@ class Connection:
                 log.info("{} seconds have passed but Ego hasn't received any control messages.".format(elapsed))
                 log.info("Please also check if your route has been set correctly in Dreamview.")
 
-            elapsed += run_time
+            elapsed = time.time() - start_time
         else:
-            log.error("No control message from Apollo within {} seconds. Aborting...".format(timeout))
+            log.error("No control message from Apollo within {} seconds. Aborting...".format(default_timeout))
             self.disable_apollo()
             #  raise WaitApolloError()
             return False
