@@ -391,6 +391,21 @@ class Connection:
             data = json.loads(self.instrumentation_ws.recv())
         return data
 
+    def get_nearest_lane(self, x, y):
+        self.instrumentation_ws.send(json.dumps(
+            {
+                "type": "RequestNearestLane",
+                "point": {
+                    "x": x,
+                    "y": y,
+                }
+            }
+        ))
+
+        data = json.loads(self.instrumentation_ws.recv())
+        while data["type"] != "Lane":
+            data = json.loads(self.instrumentation_ws.recv())
+        return data
 
 class WaitApolloError(Exception):
     """
