@@ -53,9 +53,14 @@ class Vector:
     def __neg__(self):
         return Vector(-self.x, -self.y, -self.z)
 
+    def dot(self, v):
+        if isinstance(v, Vector):
+            return (self.x * v.x + self.y * v.y + self.z * v.z)
+        else:
+            raise TypeError("Vector dot only allow Vector")
+
     def magnitude(self):
         return sqrt(self.x**2 + self.y**2 + self.z**2)
-
 
 class BoundingBox:
     def __init__(self, min, max):
