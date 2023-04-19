@@ -388,3 +388,12 @@ class Simulator:
             "position": position.to_json(),
         })
         return j
+
+    # position is dictionary with following structure
+    # {"x": 0.0, "y": 0.0}
+    @accepts(dict)
+    def convert_to_world_position(self, position):
+        j = self.remote.command("simulator/convert_apollo_point", {
+            "position": position,
+        })
+        return j
