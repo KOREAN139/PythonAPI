@@ -381,3 +381,10 @@ class Simulator:
             "type": control_type,
         })
         return Controllable(self.remote, j)
+
+    @accepts(Vector)
+    def get_closest_lane(self, position):
+        j = self.remote.command("simulator/get_closest_lane", {
+            "position": position.to_json(),
+        })
+        return j
