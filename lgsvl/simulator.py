@@ -102,9 +102,9 @@ class Simulator:
     def stop(self):
         self.stopped = True
 
-    @accepts((int, float), (int, float))
-    def run(self, time_limit=0.0, time_scale=None):
-        self._process("simulator/run", {"time_limit": time_limit, "time_scale": time_scale})
+    @accepts((int, float), (int, float), str)
+    def run(self, time_limit=0.0, time_scale=None, filename=None):
+        self._process("simulator/run", {"time_limit": time_limit, "time_scale": time_scale, "filename": filename})
 
     def _add_callback(self, agent, name, fn):
         if agent not in self.callbacks:

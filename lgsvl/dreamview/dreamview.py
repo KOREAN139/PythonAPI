@@ -305,7 +305,7 @@ class Connection:
                     "Warning: Apollo module {} is not running!!!".format(module)
                 )
 
-    def setup_apollo(self, dest_x, dest_z, modules, default_timeout=60.0, coord_type=CoordType.Unity):
+    def setup_apollo(self, dest_x, dest_z, modules, default_timeout=60.0, coord_type=CoordType.Unity, filename=None):
         """
         Starts a list of Apollo modules and sets the destination. Will wait for Control module to send a message before returning.
         Control sending a message indicates that all modules are working and Apollo is ready to continue.
@@ -347,7 +347,7 @@ class Connection:
         run_time = 2
         elapsed = time.time() - start_time
         while elapsed < default_timeout:
-            self.sim.run(run_time)
+            self.sim.run(time_limit=run_time, filename=filename)
 
             if self.ego.is_control_received:
                 break
