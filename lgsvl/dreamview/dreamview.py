@@ -407,6 +407,14 @@ class Connection:
             data = json.loads(self.instrumentation_ws.recv())
         return data
 
+    def reset_all_modules(self):
+        self.ws.send(json.dumps(
+            {
+                "type": "HMIAction",
+                "action": "RESET_MODE",
+            }
+        ))
+
 class WaitApolloError(Exception):
     """
     Raised when Apollo control message is not received in time
