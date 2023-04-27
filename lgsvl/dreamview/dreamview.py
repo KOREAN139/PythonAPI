@@ -38,6 +38,8 @@ class Connection:
         self.gps_offset = lgsvl.Vector()
         self.instrumentation_url = "ws://" + ip + ":" + port + "/instrumentation"
         self.instrumentation_ws = create_connection(self.instrumentation_url)
+        self.teleop_url = "ws://" + ip + ":" + port + "/teleop"
+        self.teleop_ws = create_connection(self.teleop_url)
 
     def set_destination(self, x_long_east, z_lat_north, y=0, coord_type=CoordType.Unity):
         """
@@ -412,6 +414,15 @@ class Connection:
             {
                 "type": "HMIAction",
                 "action": "RESET_MODE",
+            }
+        ))
+
+    # command is one of these in string
+    # EStop, PullOver, ResumeCruise
+    def teleop_command(self, command):
+        self.teleop_ws.send(json.dumps(
+            {
+                "type": command,
             }
         ))
 
