@@ -378,6 +378,14 @@ class Connection:
         while data["type"] != "Instrumentation":
             data = json.loads(self.instrumentation_ws.recv())
         return data
+    
+    def reset_planning_module(self):
+        self.instrumentation_ws.send(json.dumps(
+            {
+                "type": "RequestPlanningReset",
+            }
+        ))
+        return
 
     def get_hdmap_data(self):
         self.instrumentation_ws.send(json.dumps(
