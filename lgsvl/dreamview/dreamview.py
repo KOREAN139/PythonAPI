@@ -108,6 +108,7 @@ class Connection:
                 }
             )
         )
+        print(current_gps.easting, easting_adjustment, current_gps.northing, northing_adjustment)
 
         return
 
@@ -444,6 +445,12 @@ class Connection:
             }
         ))
 
+    def capture_coverage(self):
+        self.instrumentation_ws.send(json.dumps(
+            {
+                "type": "RequestDumpCoverage",
+            }
+        ))
 
 class WaitApolloError(Exception):
     """
